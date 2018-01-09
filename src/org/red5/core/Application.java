@@ -1,30 +1,16 @@
 package org.red5.core;
 
-/*
- * RED5 Open Source Flash Server - http://www.osflash.org/red5
- * 
- * Copyright (c) 2006-2008 by respective authors (see below). All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or modify it under the 
- * terms of the GNU Lesser General Public License as published by the Free Software 
- * Foundation; either version 2.1 of the License, or (at your option) any later 
- * version. 
- * 
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along 
- * with this library; if not, write to the Free Software Foundation, Inc., 
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
- */
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.adapter.MultiThreadedApplicationAdapter;
 import org.red5.server.api.IConnection;
 import org.red5.server.api.scope.IScope;
 //import org.slf4j.Logger;
 import org.red5.server.api.stream.IBroadcastStream;
+
+import medialive.DAO.impl.playbackDAOImpl;
+import medialive.domain.playback;
 
 /**
  * Sample application that uses the client manager.
@@ -40,6 +26,7 @@ public class Application extends MultiThreadedApplicationAdapter {
 	public boolean connect(IConnection conn, IScope scope, Object[] params) {
     	//log.info("appConnect");
     	System.out.println("连接成功...");
+    	System.out.println(scope.getContextPath());
 		return true;
 	}
 
@@ -55,13 +42,22 @@ public class Application extends MultiThreadedApplicationAdapter {
 	@Override
 	public void streamPublishStart(IBroadcastStream stream) {
 		// TODO Auto-generated method stub
-		System.out.println("开始发布并存储");
-		
+		System.out.println("开始发布并存储,存储的文件名为日期加流名称");
+		StringBuilder fileName = new StringBuilder();
+		SimpleDateFormat dateFormate = new SimpleDateFormat("yyyy-MM-dd");
+		fileName.append(dateFormate.format(new Date())).append("-").append(stream.getPublishedName());
 		try {
-			stream.saveAs(stream.getPublishedName(), false);
+			stream.saveAs(fileName.toString(), true);
 			} catch (Exception e) {
 			e.printStackTrace();
 			}
+		System.out.println("视频数据入库");
+		playbackDAOImpl playbackDAO = new playbackDAOImpl();
+		playback pbDemo = new playback();
+		pbDemo.setStreamName(stream.getPublishedName());
+		pbDemo.setLiveDate(new Date());
+		pbDemo.setFileName(fileName.toString());
+		playbackDAO.save(pbDemo);
 		super.streamPublishStart(stream);
 		
 	}
