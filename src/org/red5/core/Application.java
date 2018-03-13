@@ -65,7 +65,7 @@ public class Application extends MultiThreadedApplicationAdapter {
 		Transaction ts = session.beginTransaction();
 		Criteria c = session.createCriteria(Live.class);
 		c.add(Restrictions.eq("streamName", stream.getPublishedName()));
-		List<Live> live = (List<Live>)c.list();
+		List<Live> live = (List<Live>) c.list();
 		ts.commit();
 		if (live.size() == 0) {
 			System.out.println("当前流(" + stream.getPublishedName() + ")的用户没有注册，直播间不予显示");
@@ -75,12 +75,12 @@ public class Application extends MultiThreadedApplicationAdapter {
 			System.out.println("改变直播间状态为在播");
 			Live changeLive = live.get(0);
 			changeLive.setIsOpen(true);
-//			修改提交
+			// 修改提交
 			ts = session.beginTransaction();
 			session.save(changeLive);
 			ts.commit();
-			
-			//下面为存储回放文件
+
+			// 下面为存储回放文件
 			// 建立string builder 准备拼接文件名称
 			StringBuilder fileName = new StringBuilder();
 			// 格式化日期
@@ -94,13 +94,18 @@ public class Application extends MultiThreadedApplicationAdapter {
 				e.printStackTrace();
 			}
 			// 将视频信息写入数据库
-			System.out.println("视频数据入库");
+			System.out.println("视频数据入库,时间精确到天");
 			ts = session.beginTransaction();
 			PlayBack playback = new PlayBack();
 			playback.setuName(changeLive.getuName());
 			playback.setLiveTime(new Date());
 			playback.setFileName(fileName.toString());
-			session.save(playback);
+			Criteria s = session.createCriteria(playback.getClass());
+			s.add(Restrictions.eq("fileName", playback.getFileName()));
+			List<PlayBack> p = s.list();
+			if (p.size() == 0) {
+				session.save(playback);
+			}
 			ts.commit();
 		}
 		session.close();
@@ -113,12 +118,24 @@ public class Application extends MultiThreadedApplicationAdapter {
 		// TODO Auto-generated method stub
 		System.out.println("广播关闭,删除直播信息");
 		System.out.println("找到发布直播流的用户并改变当前在线状态");
-//		Session session = sessionfactory.openSession();
-//		Transaction ts = session.beginTransaction();
-//		Criteria c = session.createCriteria(Live.class);
-//		List<Live> live;
-//		c.add(Restrictions.eq("streamName", stream.getPublishedName()));
-		
+		Session session = sessionfactory.openSession();
+		Transaction ts = session.beginTransaction();
+		// 往下是数据库逻辑
+		Criteria c = session.createCriteria(Live.class);
+		List<Live> live;
+		c.add(Restrictions.eq("streamName", stream.getPublishedName()));
+		live = c.list();
+		if (live.size() == 0) {
+			System.out.println("有未注册的匿名流退出");
+		} else {
+			Live changeLive = live.get(0);
+			System.out.println("用户" + changeLive.getuName() + "停止直播");
+			System.out.println("清除直播间信息");
+			changeLive.setIsOpen(false);
+			session.save(changeLive);
+		}
+		ts.commit();
+		session.close();
 		super.streamBroadcastClose(stream);
 
 	}

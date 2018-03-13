@@ -10,6 +10,6 @@
         </id>
         <property name="uName" type="string" />
         <property name="liveTime" type="date" />
-        <property name="fileName" type="string" />        
+        <property name="fileName" type="string" unique="true" />        
     </class>
 </hibernate-mapping>
