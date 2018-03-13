@@ -1,10 +1,12 @@
 package bean.playback;
 
+import java.util.Date;
+
 public class PlayBack {
 
 	int id;
 	String uName;
-	String liveTime;
+	Date liveTime;
 	String fileName;
 	public int getId() {
 		return id;
@@ -18,10 +20,10 @@ public class PlayBack {
 	public void setuName(String uName) {
 		this.uName = uName;
 	}
-	public String getLiveTime() {
+	public Date getLiveTime() {
 		return liveTime;
 	}
-	public void setLiveTime(String liveTime) {
+	public void setLiveTime(Date liveTime) {
 		this.liveTime = liveTime;
 	}
 	public String getFileName() {

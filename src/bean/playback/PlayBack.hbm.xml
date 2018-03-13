@@ -9,7 +9,7 @@
             <generator class="native"/>
         </id>
         <property name="uName" type="string" />
-        <property name="liveTime" type="string" />
+        <property name="liveTime" type="date" />
         <property name="fileName" type="string" />        
     </class>
 </hibernate-mapping>

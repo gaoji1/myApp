@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="bean.live">
+    <class name="Live">
+        <id name="id" type="int" column="id">
+            <generator class="native"/>
+        </id>
+        <property name="uName" type="string" />
+        <property name="roomName" type="string" />
+        <property name="streamName" type="string" />
+        <property name="isOpen" type="boolean" />
+    </class>
+</hibernate-mapping>
